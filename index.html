@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCFHS HARD Exam (100 Items)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card-sec: #f8f9fa;
+      --border: #e1e4e8;
+      --text: #000000;
+      --danger: #cb2431;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"] {
+      padding: 4px 6px;
+      border: 1px solid #767676;
+      border-radius: 2px;
+      font-size: 0.9rem;
+    }
+
+    .timer {
+      color: var(--danger);
+      font-size: 1.1rem;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .q-card {
+      background: #ffffff;
+      border: 1px solid #e1e4e8;
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .q-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .options-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .options-group label {
+      font-weight: normal;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-submit {
+      padding: 4px 12px;
+      border: 1px solid #767676;
+      background: #f0f0f0;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 0.85rem;
+    }
+
+    .btn-submit:hover {
+      background: #e0e0e0;
+    }
+
+    .analytics-card {
+      background: var(--card-sec);
+      border: 1px solid #e1e4e8;
+      border-radius: 4px;
+      padding: 16px;
+    }
+
+    .analytics-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .stat-line {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .status-badge {
+      font-weight: 700;
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #b08800;
+    }
+
+    .fail-banner {
+      background-color: #ffdce0;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>SCFHS HARD Exam (100 Items)</h1>
+
+  <div class="form-group">
+    <label for="student-name">Name:</label>
+    <input type="text" id="student-name" autocomplete="off">
+  </div>
+
+  <div class="timer" id="timer-display">300</div>
+
+  <div class="fail-banner" id="fail-banner">
+    FAST FAIL TERMINATION: CRITICAL CLINICAL OR PRIORITY ERROR DETECTED!
+  </div>
+
+  <div class="q-card" id="q-card">
+    <div class="q-title" id="q-title">Loading high-difficulty exam...</div>
+    <div class="options-group" id="options-container"></div>
+    <button class="btn-submit" id="btn-submit" onclick="submitAnswer()">Submit</button>
+  </div>
+
+  <div class="analytics-card">
+    <div class="analytics-title">Analytics</div>
+    <div class="stat-line">Score: <span id="stat-score">0/0</span></div>
+    <div class="stat-line">Delay: <span id="stat-delay">0</span></div>
+    <div class="stat-line">Scope: <span id="stat-scope">0</span></div>
+    <div class="stat-line">ABC: <span id="stat-abc">0</span></div>
+    <div class="stat-line">Safety: <span id="stat-safety">0</span></div>
+    <div class="status-badge" id="status-badge">BORDERLINE</div>
+  </div>
+
+  <script>
+    // High-Yield Mistake Scenarios for SCFHS Nurse Technicians
+    const ultraHardPool = [
+      { text: "Central line suddenly disconnected, patient develops acute shortness of breath and chest pain.", options: ["Turn left Trendelenburg", "Clamp line", "Call MD", "High oxygen"], correct: 1, tag: "ABC" },
+      { text: "Blood pressure drops to 75/40 mmHg during blood transfusion, patient afebrile.", options: ["Stop blood", "Slow rate", "Call MD", "Give Saline"], correct: 0, tag: "Safety" },
+      { text: "Post-op thyroidectomy patient develops laryngospasm and severe inspiratory stridor.", options: ["Call emergency team", "Trach kit bed-side", "Bag mask", "Give oxygen"], correct: 0, tag: "ABC" },
+      { text: "Unconscious hypoglycemic patient (BG 30 mg/dL) with IV line in place.", options: ["Give D50W IV", "Glucagon IM", "Call MD", "Oral glucose gel"], correct: 0, tag: "Scope" },
+      { text: "Patient with chest tube drainage system tipped over; tubing pulled from drainage unit.", options: ["Submerge in water", "Clamp tube", "Call MD", "Reconnect unit"], correct: 0, tag: "ABC" },
+      { text: "Active arterial bleeding from femoral catheter site post-PCI.", options: ["Direct pressure", "Call MD", "Check distal pulse", "Sandbag site"], correct: 0, tag: "ABC" },
+      { text: "Tracheostomy patient with thick secretions blocking inner cannula completely.", options: ["Remove inner cannula", "Suction cannula", "Call MD", "Hyperoxygenate"], correct: 0, tag: "ABC" },
+      { text: "Infusion of vesicant chemotherapy extravasating into subcutaneous tissue.", options: ["Stop infusion", "Aspirate drug", "Call MD", "Apply compress"], correct: 0, tag: "Safety" },
+      { text: "IV Potassium Chloride ordered as 20 mEq direct IV push for severe hypokalemia.", options: ["Refuse order", "Give over 10m", "Dilute 50ml", "Call pharmacist"], correct: 0, tag: "Safety" },
+      { text: "Post-op abdominal evisceration occurs while patient is coughing.", options: ["Cover moist gauze", "Push organs in", "Call MD", "High Fowlers"], correct: 0, tag: "Safety" },
+      { text: "Patient on morphine PCA unarousable with respiratory rate of 6 breaths/min.", options: ["Stop PCA", "Give Naloxone", "Call MD", "Sternal rub"], correct: 0, tag: "ABC" },
+      { text: "Tonic-clonic seizure begins while patient is seated in a wheelchair.", options: ["Lower to floor", "Put pillow head", "Call MD", "Hold arms"], correct: 0, tag: "Safety" },
+      { text: "Continuous enteral tube feeding patient vomiting violently.", options: ["Stop pump", "Suction mouth", "Turn to side", "Call MD"], correct: 0, tag: "ABC" },
+      { text: "Patient with suspected spinal injury found lying on floor, unresponsive.", options: ["Jaw-thrust maneuver", "Head-tilt chin-lift", "Call MD", "Logroll side"], correct: 0, tag: "ABC" },
+      { text: "Post-cardiac cath groin dressing shows expanding hematoma.", options: ["Manual compression", "Reinforce dressing", "Call MD", "Mark border"], correct: 0, tag: "ABC" },
+      { text: "Central venous catheter dressing completely wet and non-occlusive.", options: ["Change dressing", "Reinforce tape", "Call MD", "Document"], correct: 0, tag: "Safety" },
+      { text: "Patient with pulmonary embolism suddenly exhibits apnea.", options: ["Start bag-valve mask", "Call code", "Give 100% O2", "Elevate bed"], correct: 0, tag: "ABC" },
+      { text: "Suspected active Tuberculosis patient presenting at outpatient reception.", options: ["Surgical mask patient", "N95 staff mask", "Isolate room", "Call MD"], correct: 0, tag: "Safety" },
+      { text: "Patient receiving IV heparin has blood in urine and aPTT > 150 seconds.", options: ["Stop heparin", "Call MD", "Protamine IV", "Recheck aPTT"], correct: 0, tag: "Safety" },
+      { text: "Enteral feeding tube placement verification before first bolus feeding.", options: ["X-ray result check", "pH testing", "Air auscultation", "Water dip"], correct: 0, tag: "Safety" },
+      { text: "Patient experiencing severe anaphylaxis after antibiotic IV injection.", options: ["Stop infusion", "Epinephrine IM", "Call MD", "High Fowlers"], correct: 0, tag: "Safety" },
+      { text: "Ventilator high-pressure alarm sounding continuously; patient cyanotic.", options: ["Manually bag patient", "Suction tube", "Call RT", "Silence alarm"], correct: 0, tag: "ABC" },
+      { text: "Patient in bed pulling forcefully on urinary catheter with inflated balloon.", options: ["Deflate balloon", "Apply restraints", "Call MD", "Reorient patient"], correct: 3, tag: "Delay" },
+      { text: "C. difficile patient room hygiene protocol.", options: ["Soap and water", "Alcohol hand rub", "Chlorhexidine", "Sterile gloves"], correct: 0, tag: "Safety" },
+      { text: "Restraint patient displays cold, pale hand on restrained extremity.", options: ["Release restraint", "Loosen tie", "Call MD", "Check pulse"], correct: 0, tag: "Safety" }
+    ];
+
+    // Build the full 100 items dataset programmatically
+    const questions = [];
+    for (let i = 0; i < 100; i++) {
+      const base = ultraHardPool[i % ultraHardPool.length];
+      questions.push({
+        text: `${base.text} (Case ${i + 1})`,
+        options: [...base.options],
+        correct: base.correct,
+        tag: base.tag
+      });
+    }
+
+    let currentIndex = 0;
+    let score = 0;
+    let totalAnswered = 0;
+    let counts = { Delay: 0, Scope: 0, ABC: 0, Safety: 0 };
+    let timer = 300;
+    let isTerminated = false;
+
+    const timerInterval = setInterval(() => {
+      if (timer > 0 && !isTerminated) {
+        timer--;
+        document.getElementById('timer-display').innerText = timer;
+      } else if (timer === 0 && !isTerminated) {
+        triggerFastFail("TIME EXPIRED");
+      }
+    }, 1000);
+
+    function loadQuestion() {
+      if (isTerminated) return;
+
+      if (currentIndex >= questions.length) {
+        document.getElementById('q-title').innerText = "EXAM PASSED PERFECTLY!";
+        document.getElementById('options-container').innerHTML = "";
+        document.getElementById('btn-submit').style.display = "none";
+        document.getElementById('status-badge').innerText = "PASSED";
+        document.getElementById('status-badge').style.color = "green";
+        return;
+      }
+
+      const q = questions[currentIndex];
+      document.getElementById('q-title').innerText = `Q${currentIndex + 1}\n${q.text}`;
+      
+      let html = "";
+      q.options.forEach((opt, i) => {
+        html += `<label><input type="radio" name="option" value="${i}"> ${opt}</label>`;
+      });
+      document.getElementById('options-container').innerHTML = html;
+    }
+
+    function submitAnswer() {
+      if (isTerminated) return;
+
+      const selected = document.querySelector('input[name="option"]:checked');
+      if (!selected) return;
+
+      const answerVal = parseInt(selected.value);
+      const q = questions[currentIndex];
+
+      totalAnswered++;
+      if (answerVal === q.correct) {
+        score++;
+        currentIndex++;
+        updateAnalytics();
+        loadQuestion();
+      } else {
+        counts[q.tag] = (counts[q.tag] || 0) + 1;
+        triggerFastFail(`CRITICAL ${q.tag.toUpperCase()} ERROR`);
+      }
+    }
+
+    function triggerFastFail(reason) {
+      isTerminated = true;
+      const banner = document.getElementById('fail-banner');
+      banner.innerText = `FAST FAIL TERMINATION: ${reason}!`;
+      banner.style.display = "block";
+      
+      document.getElementById('q-card').style.opacity = "0.5";
+      document.getElementById('btn-submit').disabled = true;
+      
+      const badge = document.getElementById('status-badge');
+      badge.innerText = "FAST FAIL";
+      badge.style.color = "red";
+
+      updateAnalytics();
+    }
+
+    function updateAnalytics() {
+      document.getElementById('stat-score').innerText = `${score}/${totalAnswered}`;
+      document.getElementById('stat-delay').innerText = counts.Delay;
+      document.getElementById('stat-scope').innerText = counts.Scope;
+      document.getElementById('stat-abc').innerText = counts.ABC;
+      document.getElementById('stat-safety').innerText = counts.Safety;
+    }
+
+    // Load initial item
+    loadQuestion();
+  </script>
+</body>
+</html>
